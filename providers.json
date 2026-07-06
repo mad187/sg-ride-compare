@@ -15,6 +15,7 @@
       "product": "GoCar",
       "color": "#00AA13",
       "scheme": "gojek://",
+      "universal": "https://gojek.onelink.me/2351932542/sgridecompare",
       "prefill": null,
       "appStore": "https://apps.apple.com/sg/app/id944875099"
     },
@@ -32,7 +33,8 @@
       "name": "CDG Zig",
       "product": "ComfortRIDE",
       "color": "#F5C518",
-      "scheme": "cdgzig://",
+      "scheme": null,
+      "universal": "https://zig.live/campaigns/sgridecompare",
       "prefill": null,
       "appStore": "https://apps.apple.com/sg/app/id954951647"
     }

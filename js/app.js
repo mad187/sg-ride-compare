@@ -282,7 +282,9 @@ async function bookWith(providerId) {
       : `Opening ${provider.name} — destination copied${copied ? '' : ' (copy failed)'}, paste it in`
   );
   const { opened } = await launchApp(provider, trip);
-  if (!opened) {
+  // Universal-link launches handle the not-installed case themselves
+  // (they land on the provider's install page), so no warning needed.
+  if (!opened && !provider.universal) {
     toast(`${provider.name} didn't open — is it installed?`, 4000);
   }
 }
@@ -305,7 +307,8 @@ async function launchCurrent() {
   run.pad = '';
   renderRun('Opening…');
   const copied = await copyText(run.trip.to.address || run.trip.to.label);
-  const { opened } = await launchApp(provider, run.trip);
+  const result = await launchApp(provider, run.trip);
+  const opened = result.opened || !!provider.universal;
   renderRun(
     opened
       ? `Check the price in ${provider.name}, then come back and tap it in.`

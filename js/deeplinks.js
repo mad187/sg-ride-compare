@@ -14,6 +14,9 @@ function fillTemplate(template, trip) {
 
 export function buildLaunchUrl(provider, trip) {
   if (provider.prefill && trip) return fillTemplate(provider.prefill, trip);
+  // Universal links open the app when installed and fall back to the
+  // provider's web/App Store page when not, so they never dead-end.
+  if (provider.universal) return provider.universal;
   return provider.scheme;
 }
 
