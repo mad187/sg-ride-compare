@@ -1,6 +1,6 @@
 // Cache-first service worker for the app shell so the app opens
 // instantly from the home screen. API calls (other origins) pass through.
-const VERSION = 'trc-v4';
+const VERSION = 'trc-v5';
 const SHELL = [
   './',
   './index.html',
@@ -19,7 +19,13 @@ const SHELL = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)));
+  // no-cache: bypass the HTTP cache so a new version never installs
+  // stale assets (GitHub Pages serves with max-age=600)
+  e.waitUntil(
+    caches
+      .open(VERSION)
+      .then((c) => Promise.all(SHELL.map((u) => c.add(new Request(u, { cache: 'no-cache' })))))
+  );
   self.skipWaiting();
 });
 

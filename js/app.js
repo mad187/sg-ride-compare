@@ -1,3 +1,5 @@
+const APP_VERSION = 'v5';
+
 import { searchAddress, reverseLabel } from './geocode.js';
 import { getRoute } from './route.js';
 import { loadFares, estimate, fmtRange, fmtSGD } from './fares.js';
@@ -540,7 +542,11 @@ async function init() {
   $('btn-run-copy').addEventListener('click', async () => {
     const paste = pasteText(state.run.trip.to);
     const ok = await copyText(paste);
-    toast(ok ? `"${paste}" copied` : 'Copy failed — long-press to type it', 2500);
+    const btn = $('btn-run-copy');
+    btn.textContent = ok ? `✓ Copied ${paste} — paste in the app` : `✗ Copy failed — type ${paste}`;
+    setTimeout(() => {
+      if (state.run) btn.textContent = `📋 Copy ${pasteText(state.run.trip.to)}`;
+    }, 2000);
   });
   $('btn-swap').addEventListener('click', () => {
     [state.from, state.to] = [state.to, state.from];
@@ -606,8 +612,30 @@ async function init() {
 
   renderRecents();
 
+  $('app-version').textContent = `SG Ride Compare ${APP_VERSION}`;
+
+  // Self-updating: check for a new service worker every time the app is
+  // brought to the foreground, and reload once the new version activates
+  // so stale home-screen installs fix themselves.
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    navigator.serviceWorker
+      .register('./sw.js')
+      .then((reg) => {
+        reg.addEventListener('updatefound', () => {
+          const next = reg.installing;
+          if (!next) return;
+          next.addEventListener('statechange', () => {
+            if (next.state === 'activated' && navigator.serviceWorker.controller) {
+              toast('Updated — reloading…', 1500);
+              setTimeout(() => location.reload(), 800);
+            }
+          });
+        });
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) reg.update().catch(() => {});
+        });
+      })
+      .catch(() => {});
   }
 }
 
