@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="100" fill="#101418"/>
+  <rect x="24" y="24" width="464" height="464" rx="84" fill="#1b2129"/>
+  <circle cx="150" cy="150" r="34" fill="#2ea44f"/>
+  <circle cx="362" cy="362" r="34" fill="#e5534b"/>
+  <path d="M150 196 L150 260 Q150 300 190 300 L322 300 Q362 300 362 340 L362 328" stroke="#2f81f7" stroke-width="30" fill="none" stroke-linecap="round"/>
+  <text x="256" y="452" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="88" font-weight="800" fill="#eef2f6" text-anchor="middle">S$G</text>
+</svg>

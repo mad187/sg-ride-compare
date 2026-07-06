@@ -1,0 +1,40 @@
+{
+  "providers": [
+    {
+      "id": "grab",
+      "name": "Grab",
+      "product": "JustGrab",
+      "color": "#00B14F",
+      "scheme": "grab://open",
+      "prefill": "grab://open?screenType=BOOKING&pickUpLatitude={plat}&pickUpLongitude={plng}&pickUpAddress={paddr}&dropOffLatitude={dlat}&dropOffLongitude={dlng}&dropOffAddress={daddr}",
+      "appStore": "https://apps.apple.com/sg/app/id647268330"
+    },
+    {
+      "id": "gojek",
+      "name": "Gojek",
+      "product": "GoCar",
+      "color": "#00AA13",
+      "scheme": "gojek://",
+      "prefill": null,
+      "appStore": "https://apps.apple.com/sg/app/id944875099"
+    },
+    {
+      "id": "tada",
+      "name": "TADA",
+      "product": "Economy",
+      "color": "#0DD3C5",
+      "scheme": "tada://",
+      "prefill": null,
+      "appStore": "https://apps.apple.com/sg/app/id1412329684"
+    },
+    {
+      "id": "zig",
+      "name": "CDG Zig",
+      "product": "ComfortRIDE",
+      "color": "#F5C518",
+      "scheme": "cdgzig://",
+      "prefill": null,
+      "appStore": "https://apps.apple.com/sg/app/id954951647"
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <title>SG Ride Compare</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="RideCompare" />
+  <meta name="theme-color" content="#101418" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="./icons/icon-180.png" />
+  <link rel="icon" href="./icons/icon-192.png" />
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <!-- HOME -->
+  <section id="screen-home" class="screen">
+    <header class="topbar">
+      <h1>SG Ride Compare</h1>
+      <button id="btn-settings" class="icon-btn" aria-label="Settings">⚙︎</button>
+    </header>
+
+    <div class="addr-box">
+      <div class="addr-row">
+        <span class="dot dot-from"></span>
+        <input id="input-from" type="text" placeholder="From — address or postal code" autocomplete="off" />
+        <button id="btn-locate" class="icon-btn" title="Use my location">📍</button>
+      </div>
+      <div class="addr-divider">
+        <button id="btn-swap" class="icon-btn small" title="Swap">⇅</button>
+      </div>
+      <div class="addr-row">
+        <span class="dot dot-to"></span>
+        <input id="input-to" type="text" placeholder="To — address or postal code" autocomplete="off" />
+        <button id="btn-clear-to" class="icon-btn" title="Clear">✕</button>
+      </div>
+      <div id="suggestions" class="suggestions hidden"></div>
+    </div>
+
+    <div id="recents" class="recents"></div>
+
+    <div id="quickbook" class="quickbook hidden">
+      <div id="route-summary" class="route-summary"></div>
+      <button id="btn-book-best" class="big-btn book-btn"></button>
+      <div id="estimate-list" class="estimate-list"></div>
+      <button id="btn-check-all" class="big-btn secondary"></button>
+      <p class="fine-print">Estimates only — live surge prices show in each app. Tap a row to book with that app instead.</p>
+    </div>
+  </section>
+
+  <!-- CHECK-ALL RUN -->
+  <section id="screen-run" class="screen hidden">
+    <header class="topbar">
+      <button id="btn-run-cancel" class="icon-btn" aria-label="Cancel">←</button>
+      <h1 id="run-progress"></h1>
+      <span class="icon-btn"></span>
+    </header>
+    <div class="run-body">
+      <div id="run-provider" class="run-provider"></div>
+      <p id="run-hint" class="run-hint"></p>
+      <div id="pad-display" class="pad-display">$<span id="pad-value">0</span></div>
+      <div class="pad">
+        <button class="pad-key" data-key="1">1</button>
+        <button class="pad-key" data-key="2">2</button>
+        <button class="pad-key" data-key="3">3</button>
+        <button class="pad-key" data-key="4">4</button>
+        <button class="pad-key" data-key="5">5</button>
+        <button class="pad-key" data-key="6">6</button>
+        <button class="pad-key" data-key="7">7</button>
+        <button class="pad-key" data-key="8">8</button>
+        <button class="pad-key" data-key="9">9</button>
+        <button class="pad-key" data-key=".">.</button>
+        <button class="pad-key" data-key="0">0</button>
+        <button class="pad-key" data-key="back">⌫</button>
+      </div>
+      <button id="btn-run-save" class="big-btn">Save price & next app</button>
+      <div class="run-actions">
+        <button id="btn-run-reopen" class="small-btn">Reopen app</button>
+        <button id="btn-run-appstore" class="small-btn hidden">App Store</button>
+        <button id="btn-run-skip" class="small-btn">Skip</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- REPORT -->
+  <section id="screen-report" class="screen hidden">
+    <header class="topbar">
+      <h1>Price check results</h1>
+      <span class="icon-btn"></span>
+    </header>
+    <div id="report-list" class="report-list"></div>
+    <button id="btn-report-book" class="big-btn book-btn"></button>
+    <button id="btn-report-done" class="big-btn secondary">Done</button>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="screen-settings" class="screen hidden">
+    <header class="topbar">
+      <button id="btn-settings-back" class="icon-btn" aria-label="Back">←</button>
+      <h1>Settings</h1>
+      <span class="icon-btn"></span>
+    </header>
+    <p class="settings-note">Turn on the apps you have installed. Only these join the comparison.</p>
+    <div id="provider-toggles" class="provider-toggles"></div>
+    <button id="btn-clear-history" class="big-btn secondary">Clear saved quotes & recents</button>
+    <p class="fine-print">Fare tables live in fares.json and can be edited if providers change their pricing.</p>
+  </section>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

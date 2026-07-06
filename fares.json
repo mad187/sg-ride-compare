@@ -1,0 +1,19 @@
+{
+  "currency": "SGD",
+  "uncertainty": 0.15,
+  "peak": [
+    { "days": [1, 2, 3, 4, 5], "start": "07:00", "end": "09:30", "multiplier": 1.25, "label": "AM peak" },
+    { "days": [1, 2, 3, 4, 5], "start": "17:00", "end": "20:00", "multiplier": 1.25, "label": "PM peak" },
+    { "days": [0, 1, 2, 3, 4, 5, 6], "start": "23:00", "end": "06:00", "multiplier": 1.2, "label": "late night" }
+  ],
+  "surcharges": [
+    { "name": "Changi Airport pickup", "lat": 1.3592, "lng": 103.9894, "radiusKm": 2.5, "amount": 8.0, "appliesTo": "pickup" },
+    { "name": "Seletar Airport pickup", "lat": 1.4166, "lng": 103.8654, "radiusKm": 1.5, "amount": 3.0, "appliesTo": "pickup" }
+  ],
+  "products": {
+    "grab":  { "base": 2.90, "perKm": 0.75, "perMin": 0.30, "bookingFee": 0.80 },
+    "gojek": { "base": 2.60, "perKm": 0.68, "perMin": 0.28, "bookingFee": 0.70 },
+    "tada":  { "base": 2.50, "perKm": 0.62, "perMin": 0.26, "bookingFee": 0.50 },
+    "zig":   { "base": 4.40, "perKm": 0.62, "perMin": 0.22, "bookingFee": 2.30 }
+  }
+}
