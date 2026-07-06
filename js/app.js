@@ -18,7 +18,13 @@ const store = {
   },
 };
 
-const KEYS = { settings: 'trc.settings', recents: 'trc.recents', quotes: 'trc.quotes' };
+const KEYS = { settings: 'trc.settings', recents: 'trc.recents', quotes: 'trc.quotes', favs: 'trc.favs' };
+
+// What lands on the clipboard for pasting into provider apps. In Singapore
+// the 6-digit postal code is the fastest exact search term everywhere.
+function pasteText(place) {
+  return place.postal ? place.postal : place.label.replace(/^📍 /, '');
+}
 
 // ---------- state ----------
 const state = {
@@ -101,25 +107,55 @@ function addRecent(place) {
 
 function renderRecents() {
   const el = $('recents');
+  const favs = store.get(KEYS.favs, []);
   const recents = store.get(KEYS.recents, []);
-  if (!recents.length || (state.from && state.to)) {
+  if ((!favs.length && !recents.length) || (state.from && state.to)) {
     el.innerHTML = '';
     return;
   }
-  el.innerHTML =
-    '<div class="recents-title">Recent places</div>' +
-    recents
-      .map((r, i) => `<button class="chip" data-recent="${i}">${r.label}</button>`)
-      .join('');
+  let html = '';
+  if (favs.length) {
+    html +=
+      '<div class="recents-title">Saved places</div>' +
+      favs.map((f, i) => `<button class="chip fav" data-fav="${i}">★ ${f.name}</button>`).join('');
+  }
+  if (recents.length) {
+    html +=
+      '<div class="recents-title">Recent places</div>' +
+      recents.map((r, i) => `<button class="chip" data-recent="${i}">${r.label}</button>`).join('');
+  }
+  el.innerHTML = html;
 }
 
 function onRecentTap(e) {
-  const btn = e.target.closest('[data-recent]');
-  if (!btn) return;
-  const place = store.get(KEYS.recents, [])[Number(btn.dataset.recent)];
+  const favBtn = e.target.closest('[data-fav]');
+  const recBtn = e.target.closest('[data-recent]');
+  let place = null;
+  if (favBtn) {
+    const fav = store.get(KEYS.favs, [])[Number(favBtn.dataset.fav)];
+    if (fav) place = fav.place;
+  } else if (recBtn) {
+    place = store.get(KEYS.recents, [])[Number(recBtn.dataset.recent)];
+  }
   if (!place) return;
   if (!state.from) setPlace('from', place);
   else setPlace('to', place);
+}
+
+function saveFavorite(which) {
+  const place = state[which];
+  if (!place) {
+    toast('Pick an address first, then tap ☆ to save it');
+    return;
+  }
+  const suggested = place.label.replace(/^📍 /, '');
+  const name = prompt('Name this place (e.g. Home, Office):', suggested);
+  if (!name) return;
+  const favs = store.get(KEYS.favs, []).filter((f) => f.name !== name.trim());
+  favs.push({ name: name.trim(), place });
+  store.set(KEYS.favs, favs.slice(0, 12));
+  toast(`Saved ★ ${name.trim()}`);
+  renderRecents();
 }
 
 // ---------- address inputs ----------
@@ -275,11 +311,12 @@ function currentTrip() {
 async function bookWith(providerId) {
   const provider = state.providers.find((p) => p.id === providerId);
   const trip = currentTrip();
-  const copied = await copyText(trip.to.address || trip.to.label);
+  const paste = pasteText(trip.to);
+  const copied = await copyText(paste);
   toast(
     provider.prefill
       ? `Opening ${provider.name} with your trip…`
-      : `Opening ${provider.name} — destination copied${copied ? '' : ' (copy failed)'}, paste it in`
+      : `Opening ${provider.name} — "${paste}" copied${copied ? '' : ' FAILED'}, paste into its search`
   );
   const { opened } = await launchApp(provider, trip);
   // Universal-link launches handle the not-installed case themselves
@@ -306,18 +343,20 @@ async function launchCurrent() {
   const provider = run.order[run.idx];
   run.pad = '';
   renderRun('Opening…');
-  const copied = await copyText(run.trip.to.address || run.trip.to.label);
+  const paste = pasteText(run.trip.to);
+  const copied = await copyText(paste);
   const result = await launchApp(provider, run.trip);
   const opened = result.opened || !!provider.universal;
   renderRun(
     opened
-      ? `Check the price in ${provider.name}, then come back and tap it in.`
+      ? `Check the price in ${provider.name}, then come back and tap it in.` +
+          (provider.prefill ? '' : ` "${paste}" is on your clipboard — paste into its search.`)
       : `${provider.name} didn't seem to open. Reopen, get it from the App Store, or skip.`
   );
   $('btn-run-appstore').classList.toggle('hidden', opened);
   if (!opened) return;
   if (!provider.prefill) {
-    toast(copied ? 'Destination copied — paste it in the app' : 'Type the destination in the app', 3500);
+    toast(copied ? `"${paste}" copied — paste it in the app` : 'Copy failed — tap Copy address', 3500);
   }
 }
 
@@ -412,6 +451,22 @@ function renderSettings() {
         store.set(KEYS.settings, state.settings);
       })
     );
+  renderFavList();
+}
+
+function renderFavList() {
+  const favs = store.get(KEYS.favs, []);
+  $('fav-list').innerHTML = favs.length
+    ? favs
+        .map(
+          (f, i) => `
+      <div class="toggle-row">
+        <span class="est-name">★ ${f.name} <small>${f.place.label.replace(/^📍 /, '')}</small></span>
+        <button class="small-btn" data-del-fav="${i}">Remove</button>
+      </div>`
+        )
+        .join('')
+    : '<p class="fine-print">No saved places yet.</p>';
 }
 
 // ---------- init ----------
@@ -431,6 +486,22 @@ async function init() {
     if (btn) bookWith(btn.dataset.book);
   });
   $('btn-locate').addEventListener('click', useMyLocation);
+  $('btn-fav-from').addEventListener('click', () => saveFavorite('from'));
+  $('btn-fav-to').addEventListener('click', () => saveFavorite('to'));
+  $('fav-list').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-del-fav]');
+    if (!btn) return;
+    const favs = store.get(KEYS.favs, []);
+    favs.splice(Number(btn.dataset.delFav), 1);
+    store.set(KEYS.favs, favs);
+    renderFavList();
+    renderRecents();
+  });
+  $('btn-run-copy').addEventListener('click', async () => {
+    const paste = pasteText(state.run.trip.to);
+    const ok = await copyText(paste);
+    toast(ok ? `"${paste}" copied` : 'Copy failed — long-press to type it', 2500);
+  });
   $('btn-swap').addEventListener('click', () => {
     [state.from, state.to] = [state.to, state.from];
     $('input-from').value = state.from ? state.from.label : '';
