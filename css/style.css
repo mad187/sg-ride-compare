@@ -179,6 +179,7 @@ body {
   cursor: pointer;
 }
 .pad-key:active { background: var(--card2); }
+.pad-key.clear { color: var(--muted); }
 
 .run-actions { display: flex; justify-content: center; gap: 12px; }
 .small-btn {

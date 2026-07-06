@@ -327,12 +327,48 @@ async function bookWith(providerId) {
 }
 
 // ---------- Check-all run ----------
-function startRun() {
+// Pre-run checklist: confirm which apps join before launching anything,
+// so nobody sits through launches of apps they don't have.
+function showPreflight() {
+  renderPreflight();
+  show('screen-preflight');
+}
+
+function renderPreflight() {
+  $('preflight-toggles').innerHTML = state.providers
+    .map((p) => {
+      const on = state.settings.enabled[p.id] !== false;
+      return `
+      <label class="toggle-row">
+        <span class="est-dot" style="background:${p.color}"></span>
+        <span class="est-name">${p.name}</span>
+        <input type="checkbox" data-pf="${p.id}" ${on ? 'checked' : ''} />
+        <span class="switch"></span>
+      </label>`;
+    })
+    .join('');
+  $('preflight-toggles')
+    .querySelectorAll('input[data-pf]')
+    .forEach((cb) =>
+      cb.addEventListener('change', () => {
+        state.settings.enabled[cb.dataset.pf] = cb.checked;
+        store.set(KEYS.settings, state.settings);
+        updatePreflightStart();
+      })
+    );
+  updatePreflightStart();
+}
+
+function updatePreflightStart() {
+  const n = enabledProviders().length;
+  const btn = $('btn-preflight-start');
+  btn.textContent = n ? `Start price check (${n} app${n === 1 ? '' : 's'})` : 'Turn on at least one app';
+  btn.disabled = n === 0;
+}
+
+function beginRun() {
   const order = enabledProviders();
-  if (!order.length) {
-    toast('No apps enabled — check Settings');
-    return;
-  }
+  if (!order.length) return;
   state.run = { order, idx: 0, quotes: {}, trip: currentTrip(), pad: '' };
   show('screen-run');
   launchCurrent();
@@ -360,6 +396,12 @@ async function launchCurrent() {
   }
 }
 
+// Cash-register entry: digits fill from the right with implied cents,
+// so typing 2 4 5 0 shows $24.50 — no decimal key needed.
+function padAmount(pad) {
+  return Number(pad || '0') / 100;
+}
+
 function renderRun(hint) {
   const run = state.run;
   const provider = run.order[run.idx];
@@ -367,19 +409,17 @@ function renderRun(hint) {
   $('run-provider').innerHTML =
     `<span class="est-dot big" style="background:${provider.color}"></span>${provider.name}`;
   if (hint) $('run-hint').textContent = hint;
-  $('pad-value').textContent = run.pad || '0';
-  $('btn-run-save').disabled = !(parseFloat(run.pad) > 0);
+  $('pad-value').textContent = padAmount(run.pad).toFixed(2);
+  $('btn-run-save').disabled = !(padAmount(run.pad) > 0);
+  $('btn-run-copy').textContent = `📋 Copy ${pasteText(run.trip.to)}`;
 }
 
 function padPress(key) {
   const run = state.run;
   if (!run) return;
   if (key === 'back') run.pad = run.pad.slice(0, -1);
-  else if (key === '.') {
-    if (!run.pad.includes('.')) run.pad = (run.pad || '0') + '.';
-  } else if (run.pad.replace('.', '').length < 5) {
-    run.pad = run.pad === '0' ? key : run.pad + key;
-  }
+  else if (key === 'clear') run.pad = '';
+  else if (run.pad.length < 5) run.pad = run.pad + key;
   renderRun();
 }
 
@@ -387,7 +427,7 @@ function advanceRun(savePrice) {
   const run = state.run;
   const provider = run.order[run.idx];
   if (savePrice) {
-    const price = parseFloat(run.pad);
+    const price = padAmount(run.pad);
     if (!(price > 0)) return;
     run.quotes[provider.id] = price;
   }
@@ -518,7 +558,12 @@ async function init() {
   $('btn-book-best').addEventListener('click', () => {
     if (state.ranked.length) bookWith(state.ranked[0].provider.id);
   });
-  $('btn-check-all').addEventListener('click', startRun);
+  $('btn-check-all').addEventListener('click', showPreflight);
+  $('btn-preflight-start').addEventListener('click', beginRun);
+  $('btn-preflight-back').addEventListener('click', () => {
+    show('screen-home');
+    maybeCompute();
+  });
 
   // run screen
   document.querySelectorAll('.pad-key').forEach((btn) =>

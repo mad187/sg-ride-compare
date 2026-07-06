@@ -1,6 +1,6 @@
 // Cache-first service worker for the app shell so the app opens
 // instantly from the home screen. API calls (other origins) pass through.
-const VERSION = 'trc-v3';
+const VERSION = 'trc-v4';
 const SHELL = [
   './',
   './index.html',

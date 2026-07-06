@@ -62,7 +62,8 @@
     <div class="run-body">
       <div id="run-provider" class="run-provider"></div>
       <p id="run-hint" class="run-hint"></p>
-      <div id="pad-display" class="pad-display">$<span id="pad-value">0</span></div>
+      <button id="btn-run-copy" class="big-btn secondary"></button>
+      <div id="pad-display" class="pad-display">$<span id="pad-value">0.00</span></div>
       <div class="pad">
         <button class="pad-key" data-key="1">1</button>
         <button class="pad-key" data-key="2">2</button>
@@ -73,18 +74,29 @@
         <button class="pad-key" data-key="7">7</button>
         <button class="pad-key" data-key="8">8</button>
         <button class="pad-key" data-key="9">9</button>
-        <button class="pad-key" data-key=".">.</button>
+        <button class="pad-key clear" data-key="clear">C</button>
         <button class="pad-key" data-key="0">0</button>
         <button class="pad-key" data-key="back">⌫</button>
       </div>
       <button id="btn-run-save" class="big-btn">Save price & next app</button>
+      <button id="btn-run-skip" class="big-btn secondary">Skip this app</button>
       <div class="run-actions">
         <button id="btn-run-reopen" class="small-btn">Reopen app</button>
-        <button id="btn-run-copy" class="small-btn">Copy address</button>
         <button id="btn-run-appstore" class="small-btn hidden">App Store</button>
-        <button id="btn-run-skip" class="small-btn">Skip</button>
       </div>
     </div>
+  </section>
+
+  <!-- PRE-RUN CHECKLIST -->
+  <section id="screen-preflight" class="screen hidden">
+    <header class="topbar">
+      <button id="btn-preflight-back" class="icon-btn" aria-label="Back">←</button>
+      <h1>Check live prices</h1>
+      <span class="icon-btn"></span>
+    </header>
+    <p class="settings-note">Toggle off any app you don't have — it's remembered for next time.</p>
+    <div id="preflight-toggles" class="provider-toggles"></div>
+    <button id="btn-preflight-start" class="big-btn"></button>
   </section>
 
   <!-- REPORT -->
